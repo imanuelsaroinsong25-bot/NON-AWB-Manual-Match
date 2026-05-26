@@ -1,6 +1,7 @@
 # =========================================================
 # NON AWB MANUAL MATCH V1
-# SPX STYLE VERSION
+# SPX STYLE UI + MOBILE + DESKTOP
+# FULL VERSION
 # =========================================================
 
 import streamlit as st
@@ -19,27 +20,50 @@ st.set_page_config(
 )
 
 # =========================================================
-# SPX STYLE CSS
+# MOBILE DETECTOR
+# =========================================================
+
+mobile = st.query_params.get("mobile")
+
+if mobile == "1":
+    IS_MOBILE = True
+else:
+    IS_MOBILE = False
+
+# =========================================================
+# SPX CSS UI
 # =========================================================
 
 st.markdown("""
+
 <style>
 
-html, body, [class*="css"]  {
+/* ===================================================== */
+/* GLOBAL */
+/* ===================================================== */
+
+html, body, [class*="css"] {
+
     background-color: #FFF7F2;
-    font-size: 14px;
+    font-family: sans-serif;
+
 }
 
 .block-container {
+
     padding-top: 1rem;
     padding-bottom: 1rem;
-    padding-left: 0.7rem;
-    padding-right: 0.7rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
 }
 
+/* ===================================================== */
 /* HEADER */
+/* ===================================================== */
 
 .spx-header {
+
     background: linear-gradient(
         90deg,
         #EE4D2D,
@@ -47,33 +71,44 @@ html, body, [class*="css"]  {
     );
 
     padding: 20px;
-    border-radius: 16px;
+    border-radius: 18px;
     color: white;
     margin-bottom: 20px;
+
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+
 }
 
 .spx-title {
-    font-size: 28px;
+
+    font-size: 32px;
     font-weight: bold;
+
 }
 
 .spx-subtitle {
-    font-size: 14px;
+
     opacity: 0.9;
+    margin-top: 5px;
+
 }
 
+/* ===================================================== */
 /* METRIC */
+/* ===================================================== */
 
 div[data-testid="metric-container"] {
 
     background: white;
     border-radius: 14px;
-    padding: 12px;
+    padding: 15px;
     border: 2px solid #FFE1D9;
 
 }
 
+/* ===================================================== */
 /* BUTTON */
+/* ===================================================== */
 
 .stButton > button {
 
@@ -84,8 +119,6 @@ div[data-testid="metric-container"] {
 
 }
 
-/* DOWNLOAD BUTTON */
-
 .stDownloadButton > button {
 
     background-color: #EE4D2D;
@@ -95,14 +128,45 @@ div[data-testid="metric-container"] {
 
 }
 
+/* ===================================================== */
+/* SEARCH */
+/* ===================================================== */
+
+input {
+
+    border-radius: 10px !important;
+
+}
+
+/* ===================================================== */
+/* MOBILE */
+/* ===================================================== */
+
+@media (max-width: 768px) {
+
+    .spx-title {
+
+        font-size: 22px;
+
+    }
+
+}
+
 </style>
+
 """, unsafe_allow_html=True)
 
 # =========================================================
-# HEADER
+# HEADER UI
 # =========================================================
 
-st.markdown("""
+device_text = (
+    "📱 Mobile Mode"
+    if IS_MOBILE
+    else "💻 Desktop Mode"
+)
+
+st.markdown(f"""
 
 <div class="spx-header">
 
@@ -112,6 +176,10 @@ st.markdown("""
 
 <div class="spx-subtitle">
 SPX Internal Warehouse Tools
+</div>
+
+<div style="margin-top:8px;">
+{device_text}
 </div>
 
 </div>
@@ -144,8 +212,8 @@ def detect_category(text):
             "hoodie",
             "kaos",
             "sepatu",
-            "tas",
-            "kemeja"
+            "kemeja",
+            "tas"
 
         ],
 
@@ -155,27 +223,27 @@ def detect_category(text):
             "laptop",
             "monitor",
             "tv",
-            "keyboard",
-            "mouse"
+            "mouse",
+            "keyboard"
 
         ],
 
         "🍳 Rumah Tangga": [
 
-            "kompor",
             "rice cooker",
             "gelas",
             "blender",
+            "kompor",
             "ember"
 
         ],
 
         "🪑 Furniture": [
 
-            "rak",
             "lemari",
+            "meja",
             "kursi",
-            "meja"
+            "rak"
 
         ],
 
@@ -227,13 +295,12 @@ def detect_bulky(text):
     bulky_keywords = [
 
         "lemari",
-        "rak",
-        "kursi",
         "meja",
-        "monitor",
+        "kursi",
+        "rak",
         "tv",
-        "kipas",
-        "dispenser"
+        "monitor",
+        "kipas"
 
     ]
 
@@ -333,6 +400,10 @@ if uploaded_file:
     # =====================================================
     # AUTO AI SORT
     # =====================================================
+
+    st.success(
+        "🔥 AI sedang menyortir data..."
+    )
 
     df["AI_Category"] = df.astype(str).apply(
 
@@ -446,7 +517,7 @@ if uploaded_file:
     st.divider()
 
     # =====================================================
-    # RESULT
+    # RESULT TABLE
     # =====================================================
 
     st.subheader("📋 Shipment Result")
@@ -455,19 +526,27 @@ if uploaded_file:
         f"Total Result: {len(filtered_df)}"
     )
 
+    table_height = (
+        400
+        if IS_MOBILE
+        else 650
+    )
+
     st.dataframe(
         filtered_df,
         use_container_width=True,
-        height=550
+        height=table_height
     )
 
     st.divider()
 
     # =====================================================
-    # QUICK GOOGLE SEARCH
+    # QUICK SEARCH ITEM
     # =====================================================
 
-    st.subheader("🔥 Quick Item Search")
+    st.subheader(
+        "🔥 Quick Search Item"
+    )
 
     possible_columns = [
 
@@ -489,7 +568,13 @@ if uploaded_file:
 
     if search_column:
 
-        for index, row in filtered_df.head(15).iterrows():
+        limit_show = (
+            5
+            if IS_MOBILE
+            else 15
+        )
+
+        for index, row in filtered_df.head(limit_show).iterrows():
 
             sku = str(
                 row[search_column]
@@ -513,9 +598,7 @@ if uploaded_file:
                 f"📦 {sku[:80]}"
             ):
 
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
+                if IS_MOBILE:
 
                     st.link_button(
                         "🔎 Google",
@@ -523,21 +606,45 @@ if uploaded_file:
                         use_container_width=True
                     )
 
-                with col2:
-
                     st.link_button(
                         "🛒 Shopee",
                         shopee_url,
                         use_container_width=True
                     )
 
-                with col3:
-
                     st.link_button(
                         "🖼 Images",
                         image_url,
                         use_container_width=True
                     )
+
+                else:
+
+                    col1, col2, col3 = st.columns(3)
+
+                    with col1:
+
+                        st.link_button(
+                            "🔎 Google",
+                            google_url,
+                            use_container_width=True
+                        )
+
+                    with col2:
+
+                        st.link_button(
+                            "🛒 Shopee",
+                            shopee_url,
+                            use_container_width=True
+                        )
+
+                    with col3:
+
+                        st.link_button(
+                            "🖼 Images",
+                            image_url,
+                            use_container_width=True
+                        )
 
     st.divider()
 
