@@ -1,37 +1,28 @@
 # =========================================================
-# NON AWB MANUAL MATCH V1
-# SPX STYLE UI + MOBILE + DESKTOP
-# FULL VERSION
+# NON AWB MANUAL MATCH V2 ENTERPRISE UI
+# SPX STYLE DASHBOARD
+# MOBILE + DESKTOP RESPONSIVE
 # =========================================================
 
 import streamlit as st
 import pandas as pd
 from rapidfuzz import fuzz
 from urllib.parse import quote
+import plotly.express as px
 
 # =========================================================
 # PAGE CONFIG
 # =========================================================
 
 st.set_page_config(
-    page_title="NON AWB MANUAL MATCH V1",
+    page_title="NON AWB MANUAL MATCH V2",
     page_icon="📦",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # =========================================================
-# MOBILE DETECTOR
-# =========================================================
-
-mobile = st.query_params.get("mobile")
-
-if mobile == "1":
-    IS_MOBILE = True
-else:
-    IS_MOBILE = False
-
-# =========================================================
-# SPX CSS UI
+# CSS UI
 # =========================================================
 
 st.markdown("""
@@ -44,7 +35,7 @@ st.markdown("""
 
 html, body, [class*="css"] {
 
-    background-color: #FFF7F2;
+    background-color: #F6F6F6;
     font-family: sans-serif;
 
 }
@@ -62,7 +53,7 @@ html, body, [class*="css"] {
 /* HEADER */
 /* ===================================================== */
 
-.spx-header {
+.main-header {
 
     background: linear-gradient(
         90deg,
@@ -75,34 +66,37 @@ html, body, [class*="css"] {
     color: white;
     margin-bottom: 20px;
 
-    box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 
 }
 
-.spx-title {
+.main-title {
 
     font-size: 32px;
     font-weight: bold;
 
 }
 
-.spx-subtitle {
+.main-sub {
 
     opacity: 0.9;
-    margin-top: 5px;
 
 }
 
 /* ===================================================== */
-/* METRIC */
+/* CARD */
 /* ===================================================== */
 
-div[data-testid="metric-container"] {
+.metric-card {
 
     background: white;
-    border-radius: 14px;
-    padding: 15px;
-    border: 2px solid #FFE1D9;
+    padding: 18px;
+    border-radius: 18px;
+
+    box-shadow:
+    0 2px 10px rgba(0,0,0,0.05);
+
+    border: 1px solid #EEEEEE;
 
 }
 
@@ -114,8 +108,8 @@ div[data-testid="metric-container"] {
 
     background-color: #EE4D2D;
     color: white;
-    border-radius: 10px;
     border: none;
+    border-radius: 10px;
 
 }
 
@@ -123,8 +117,8 @@ div[data-testid="metric-container"] {
 
     background-color: #EE4D2D;
     color: white;
-    border-radius: 10px;
     border: none;
+    border-radius: 10px;
 
 }
 
@@ -134,7 +128,7 @@ div[data-testid="metric-container"] {
 
 input {
 
-    border-radius: 10px !important;
+    border-radius: 12px !important;
 
 }
 
@@ -144,7 +138,7 @@ input {
 
 @media (max-width: 768px) {
 
-    .spx-title {
+    .main-title {
 
         font-size: 22px;
 
@@ -157,29 +151,49 @@ input {
 """, unsafe_allow_html=True)
 
 # =========================================================
-# HEADER UI
+# SIDEBAR
 # =========================================================
 
-device_text = (
-    "📱 Mobile Mode"
-    if IS_MOBILE
-    else "💻 Desktop Mode"
-)
+with st.sidebar:
 
-st.markdown(f"""
+    st.image(
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Shopee_Express_logo.svg/2560px-Shopee_Express_logo.svg.png",
+        width=180
+    )
 
-<div class="spx-header">
+    st.markdown("## 📦 MENU")
 
-<div class="spx-title">
-📦 NON AWB MANUAL MATCH V1
+    menu = st.radio(
+
+        "",
+
+        [
+
+            "🏠 Dashboard",
+            "📦 Shipment",
+            "🧠 AI Category",
+            "📮 Bulky Check",
+            "🔎 Google Search",
+            "📥 Export"
+
+        ]
+
+    )
+
+# =========================================================
+# HEADER
+# =========================================================
+
+st.markdown("""
+
+<div class="main-header">
+
+<div class="main-title">
+📦 NON AWB MANUAL MATCH V2
 </div>
 
-<div class="spx-subtitle">
+<div class="main-sub">
 SPX Internal Warehouse Tools
-</div>
-
-<div style="margin-top:8px;">
-{device_text}
 </div>
 
 </div>
@@ -187,7 +201,7 @@ SPX Internal Warehouse Tools
 """, unsafe_allow_html=True)
 
 # =========================================================
-# FILE UPLOAD
+# UPLOAD
 # =========================================================
 
 uploaded_file = st.file_uploader(
@@ -205,54 +219,50 @@ def detect_category(text):
 
     categories = {
 
-        "👕 Fashion": [
+        "Fashion": [
 
             "celana",
             "baju",
             "hoodie",
             "kaos",
             "sepatu",
-            "kemeja",
-            "tas"
+            "kemeja"
 
         ],
 
-        "📱 Elektronik": [
+        "Elektronik": [
 
             "hp",
-            "laptop",
-            "monitor",
             "tv",
-            "mouse",
-            "keyboard"
+            "monitor",
+            "laptop",
+            "mouse"
 
         ],
 
-        "🍳 Rumah Tangga": [
+        "Rumah Tangga": [
 
-            "rice cooker",
+            "kompor",
             "gelas",
             "blender",
-            "kompor",
-            "ember"
+            "rice cooker"
 
         ],
 
-        "🪑 Furniture": [
+        "Furniture": [
 
             "lemari",
-            "meja",
+            "rak",
             "kursi",
-            "rak"
+            "meja"
 
         ],
 
-        "🧰 Peralatan Kerja": [
+        "Peralatan Kerja": [
 
             "tool",
             "bor",
             "obeng",
-            "safety",
             "kabel"
 
         ]
@@ -273,16 +283,16 @@ def detect_category(text):
 
         scores[category] = score
 
-    best_category = max(
+    best = max(
         scores,
         key=scores.get
     )
 
-    if scores[best_category] == 0:
+    if scores[best] == 0:
 
-        return "📦 Lainnya"
+        return "Lainnya"
 
-    return best_category
+    return best
 
 # =========================================================
 # BULKY DETECTOR
@@ -295,12 +305,11 @@ def detect_bulky(text):
     bulky_keywords = [
 
         "lemari",
-        "meja",
-        "kursi",
         "rak",
+        "kursi",
+        "meja",
         "tv",
-        "monitor",
-        "kipas"
+        "monitor"
 
     ]
 
@@ -308,9 +317,9 @@ def detect_bulky(text):
 
         if keyword in text:
 
-            return "📦 Bulky"
+            return "Bulky"
 
-    return "📮 Non Bulky"
+    return "Non Bulky"
 
 # =========================================================
 # SMART SEARCH
@@ -326,8 +335,7 @@ def smart_search_dataframe(dataframe, search):
     shortcuts = {
 
         "cd": "celana dalam",
-        "hp": "handphone",
-        "tv": "television"
+        "hp": "handphone"
 
     }
 
@@ -354,19 +362,14 @@ def smart_search_dataframe(dataframe, search):
             row_text
         )
 
-        if similarity >= 70:
-            return True
+        return similarity >= 70
 
-        return False
-
-    filtered = dataframe[
+    return dataframe[
         dataframe.apply(
             smart_search,
             axis=1
         )
     ]
-
-    return filtered
 
 # =========================================================
 # MAIN APP
@@ -374,31 +377,28 @@ def smart_search_dataframe(dataframe, search):
 
 if uploaded_file:
 
-    try:
+    # =====================================================
+    # READ FILE
+    # =====================================================
 
-        if uploaded_file.name.endswith(".csv"):
+    if uploaded_file.name.endswith(".csv"):
 
-            df = pd.read_csv(uploaded_file)
+        df = pd.read_csv(uploaded_file)
 
-        else:
+    else:
 
-            df = pd.read_excel(uploaded_file)
+        df = pd.read_excel(uploaded_file)
 
-        df.columns = [
+    df.columns = [
 
-            str(col).strip()
+        str(col).strip()
 
-            for col in df.columns
+        for col in df.columns
 
-        ]
-
-    except Exception as e:
-
-        st.error(f"Error membaca file: {e}")
-        st.stop()
+    ]
 
     # =====================================================
-    # AUTO AI SORT
+    # AI CATEGORY
     # =====================================================
 
     st.success(
@@ -414,6 +414,10 @@ if uploaded_file:
         axis=1
     )
 
+    # =====================================================
+    # BULKY
+    # =====================================================
+
     df["Bulky_Type"] = df.astype(str).apply(
 
         lambda row: detect_bulky(
@@ -424,35 +428,78 @@ if uploaded_file:
     )
 
     # =====================================================
-    # METRICS
+    # KPI
     # =====================================================
 
-    col1, col2, col3 = st.columns(3)
+    total_rows = len(df)
+
+    total_category = df["AI_Category"].nunique()
+
+    total_bulky = len(
+        df[
+            df["Bulky_Type"] == "Bulky"
+        ]
+    )
+
+    total_non_bulky = len(
+        df[
+            df["Bulky_Type"] == "Non Bulky"
+        ]
+    )
+
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
 
-        st.metric(
-            "Total Rows",
-            len(df)
-        )
+        st.markdown(f"""
+
+        <div class="metric-card">
+
+        <h4>Total Data</h4>
+        <h2>{total_rows:,}</h2>
+
+        </div>
+
+        """, unsafe_allow_html=True)
 
     with col2:
 
-        st.metric(
-            "Kategori",
-            df["AI_Category"].nunique()
-        )
+        st.markdown(f"""
+
+        <div class="metric-card">
+
+        <h4>Kategori</h4>
+        <h2>{total_category}</h2>
+
+        </div>
+
+        """, unsafe_allow_html=True)
 
     with col3:
 
-        st.metric(
-            "Bulky",
-            len(
-                df[
-                    df["Bulky_Type"] == "📦 Bulky"
-                ]
-            )
-        )
+        st.markdown(f"""
+
+        <div class="metric-card">
+
+        <h4>Bulky</h4>
+        <h2>{total_bulky:,}</h2>
+
+        </div>
+
+        """, unsafe_allow_html=True)
+
+    with col4:
+
+        st.markdown(f"""
+
+        <div class="metric-card">
+
+        <h4>Non Bulky</h4>
+        <h2>{total_non_bulky:,}</h2>
+
+        </div>
+
+        """, unsafe_allow_html=True)
 
     st.divider()
 
@@ -461,7 +508,7 @@ if uploaded_file:
     # =====================================================
 
     search = st.text_input(
-        "🔍 Smart Search SKU / AWB"
+        "🔍 Cari SKU / Resi / Produk"
     )
 
     filtered_df = smart_search_dataframe(
@@ -470,42 +517,39 @@ if uploaded_file:
     )
 
     # =====================================================
-    # FILTER CATEGORY
+    # FILTER
     # =====================================================
 
-    categories = sorted(
-        filtered_df["AI_Category"]
-        .unique()
-    )
+    col1, col2 = st.columns(2)
 
-    selected_category = st.multiselect(
-        "🧠 Filter Category",
-        categories
-    )
+    with col1:
 
-    if selected_category:
+        category_filter = st.multiselect(
+
+            "🧠 Filter Category",
+
+            filtered_df["AI_Category"]
+            .unique()
+
+        )
+
+    with col2:
+
+        bulky_filter = st.multiselect(
+
+            "📦 Filter Bulky",
+
+            filtered_df["Bulky_Type"]
+            .unique()
+
+        )
+
+    if category_filter:
 
         filtered_df = filtered_df[
             filtered_df["AI_Category"]
-            .isin(selected_category)
+            .isin(category_filter)
         ]
-
-    # =====================================================
-    # FILTER BULKY
-    # =====================================================
-
-    bulky_filter = st.multiselect(
-
-        "📦 Filter Bulky",
-
-        [
-
-            "📦 Bulky",
-            "📮 Non Bulky"
-
-        ]
-
-    )
 
     if bulky_filter:
 
@@ -517,43 +561,97 @@ if uploaded_file:
     st.divider()
 
     # =====================================================
-    # RESULT TABLE
+    # CHARTS
     # =====================================================
 
-    st.subheader("📋 Shipment Result")
+    chart1, chart2 = st.columns(2)
 
-    st.write(
-        f"Total Result: {len(filtered_df)}"
-    )
+    with chart1:
 
-    table_height = (
-        400
-        if IS_MOBILE
-        else 650
-    )
+        category_count = (
+            filtered_df["AI_Category"]
+            .value_counts()
+            .reset_index()
+        )
+
+        category_count.columns = [
+            "Category",
+            "Count"
+        ]
+
+        fig = px.pie(
+
+            category_count,
+
+            names="Category",
+            values="Count",
+            hole=0.5
+
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+    with chart2:
+
+        bulky_count = (
+            filtered_df["Bulky_Type"]
+            .value_counts()
+            .reset_index()
+        )
+
+        bulky_count.columns = [
+            "Type",
+            "Count"
+        ]
+
+        fig2 = px.pie(
+
+            bulky_count,
+
+            names="Type",
+            values="Count",
+            hole=0.5
+
+        )
+
+        st.plotly_chart(
+            fig2,
+            use_container_width=True
+        )
+
+    st.divider()
+
+    # =====================================================
+    # TABLE
+    # =====================================================
+
+    st.subheader("📋 Shipment Data")
 
     st.dataframe(
+
         filtered_df,
+
         use_container_width=True,
-        height=table_height
+        height=600
+
     )
 
     st.divider()
 
     # =====================================================
-    # QUICK SEARCH ITEM
+    # QUICK SEARCH
     # =====================================================
 
-    st.subheader(
-        "🔥 Quick Search Item"
-    )
+    st.subheader("🔥 Quick Google Search")
 
     possible_columns = [
 
         "sku_name",
         "model_name",
-        "product_name",
-        "item_name"
+        "product_name"
 
     ]
 
@@ -568,13 +666,7 @@ if uploaded_file:
 
     if search_column:
 
-        limit_show = (
-            5
-            if IS_MOBILE
-            else 15
-        )
-
-        for index, row in filtered_df.head(limit_show).iterrows():
+        for index, row in filtered_df.head(10).iterrows():
 
             sku = str(
                 row[search_column]
@@ -598,7 +690,9 @@ if uploaded_file:
                 f"📦 {sku[:80]}"
             ):
 
-                if IS_MOBILE:
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
 
                     st.link_button(
                         "🔎 Google",
@@ -606,45 +700,21 @@ if uploaded_file:
                         use_container_width=True
                     )
 
+                with col2:
+
                     st.link_button(
                         "🛒 Shopee",
                         shopee_url,
                         use_container_width=True
                     )
 
+                with col3:
+
                     st.link_button(
                         "🖼 Images",
                         image_url,
                         use_container_width=True
                     )
-
-                else:
-
-                    col1, col2, col3 = st.columns(3)
-
-                    with col1:
-
-                        st.link_button(
-                            "🔎 Google",
-                            google_url,
-                            use_container_width=True
-                        )
-
-                    with col2:
-
-                        st.link_button(
-                            "🛒 Shopee",
-                            shopee_url,
-                            use_container_width=True
-                        )
-
-                    with col3:
-
-                        st.link_button(
-                            "🖼 Images",
-                            image_url,
-                            use_container_width=True
-                        )
 
     st.divider()
 
@@ -673,5 +743,5 @@ if uploaded_file:
 else:
 
     st.info(
-        "Upload XLSX / CSV dulu 🔥"
+        "📂 Upload XLSX / CSV dulu"
     )
