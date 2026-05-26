@@ -14,7 +14,7 @@ from urllib.parse import quote
 # =========================================================
 
 st.set_page_config(
-    page_title="🔥 Warehouse AI Super App V8",
+    page_title="SPX NON AWB MANUAL MATCH V1",
     page_icon="🔥",
     layout="wide"
 )
