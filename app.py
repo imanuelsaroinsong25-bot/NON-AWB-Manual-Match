@@ -1,7 +1,6 @@
 # =========================================================
-# NON AWB MANUAL MATCH V2 ENTERPRISE UI
-# SPX STYLE DASHBOARD
-# MOBILE + DESKTOP RESPONSIVE
+# NON AWB MANUAL MATCH V3 - SPX ENTERPRISE UI
+# FULL MODERN UI + MOBILE RESPONSIVE
 # =========================================================
 
 import streamlit as st
@@ -15,14 +14,30 @@ import plotly.express as px
 # =========================================================
 
 st.set_page_config(
-    page_title="NON AWB MANUAL MATCH V2",
+    page_title="NON AWB MANUAL MATCH V3",
     page_icon="📦",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # =========================================================
-# CSS UI
+# HIDE STREAMLIT
+# =========================================================
+
+hide_streamlit = """
+<style>
+
+#MainMenu {visibility:hidden;}
+footer {visibility:hidden;}
+header {visibility:hidden;}
+
+</style>
+"""
+
+st.markdown(hide_streamlit, unsafe_allow_html=True)
+
+# =========================================================
+# FULL CSS
 # =========================================================
 
 st.markdown("""
@@ -35,17 +50,28 @@ st.markdown("""
 
 html, body, [class*="css"] {
 
-    background-color: #F6F6F6;
-    font-family: sans-serif;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f5f5f5;
 
 }
 
 .block-container {
 
     padding-top: 1rem;
-    padding-bottom: 1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-bottom: 0rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+
+}
+
+/* ===================================================== */
+/* SIDEBAR */
+/* ===================================================== */
+
+[data-testid="stSidebar"] {
+
+    background: white;
+    border-right: 1px solid #eeeeee;
 
 }
 
@@ -55,48 +81,95 @@ html, body, [class*="css"] {
 
 .main-header {
 
-    background: linear-gradient(
+    background:
+    linear-gradient(
         90deg,
         #EE4D2D,
         #FF6B3D
     );
 
-    padding: 20px;
-    border-radius: 18px;
+    padding: 25px;
+
+    border-radius: 24px;
+
     color: white;
+
     margin-bottom: 20px;
 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow:
+    0 10px 30px rgba(0,0,0,0.08);
 
 }
 
 .main-title {
 
-    font-size: 32px;
-    font-weight: bold;
+    font-size: 36px;
+    font-weight: 800;
 
 }
 
 .main-sub {
 
-    opacity: 0.9;
+    opacity: 0.95;
+    margin-top: 6px;
 
 }
 
 /* ===================================================== */
-/* CARD */
+/* KPI CARD */
 /* ===================================================== */
 
-.metric-card {
+.kpi-card {
 
     background: white;
-    padding: 18px;
-    border-radius: 18px;
+
+    border-radius: 22px;
+
+    padding: 22px;
+
+    border: 1px solid #f0f0f0;
 
     box-shadow:
-    0 2px 10px rgba(0,0,0,0.05);
+    0 3px 12px rgba(0,0,0,0.04);
 
-    border: 1px solid #EEEEEE;
+    transition: 0.3s;
+
+}
+
+.kpi-card:hover {
+
+    transform: translateY(-3px);
+
+}
+
+.kpi-title {
+
+    color: #777;
+    font-size: 14px;
+
+}
+
+.kpi-value {
+
+    font-size: 34px;
+    font-weight: 700;
+
+    margin-top: 10px;
+
+    color: #111;
+
+}
+
+/* ===================================================== */
+/* SEARCH BAR */
+/* ===================================================== */
+
+input {
+
+    border-radius: 15px !important;
+    border: 1px solid #e5e5e5 !important;
+
+    padding: 12px !important;
 
 }
 
@@ -106,29 +179,40 @@ html, body, [class*="css"] {
 
 .stButton > button {
 
-    background-color: #EE4D2D;
+    background:
+    linear-gradient(
+        90deg,
+        #EE4D2D,
+        #FF6B3D
+    );
+
     color: white;
+
     border: none;
-    border-radius: 10px;
+
+    border-radius: 14px;
+
+    font-weight: 600;
+
+    transition: 0.2s;
 
 }
 
-.stDownloadButton > button {
+.stButton > button:hover {
 
-    background-color: #EE4D2D;
-    color: white;
-    border: none;
-    border-radius: 10px;
+    transform: scale(1.02);
 
 }
 
 /* ===================================================== */
-/* SEARCH */
+/* DATAFRAME */
 /* ===================================================== */
 
-input {
+[data-testid="stDataFrame"] {
 
-    border-radius: 12px !important;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
 
 }
 
@@ -141,6 +225,19 @@ input {
     .main-title {
 
         font-size: 22px;
+
+    }
+
+    .kpi-value {
+
+        font-size: 24px;
+
+    }
+
+    .block-container {
+
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
 
     }
 
@@ -164,20 +261,15 @@ with st.sidebar:
     st.markdown("## 📦 MENU")
 
     menu = st.radio(
-
         "",
-
         [
-
             "🏠 Dashboard",
             "📦 Shipment",
             "🧠 AI Category",
             "📮 Bulky Check",
             "🔎 Google Search",
             "📥 Export"
-
         ]
-
     )
 
 # =========================================================
@@ -189,7 +281,7 @@ st.markdown("""
 <div class="main-header">
 
 <div class="main-title">
-📦 NON AWB MANUAL MATCH V2
+📦 NON AWB MANUAL MATCH V3
 </div>
 
 <div class="main-sub">
@@ -210,7 +302,7 @@ uploaded_file = st.file_uploader(
 )
 
 # =========================================================
-# CATEGORY DETECTOR
+# CATEGORY AI
 # =========================================================
 
 def detect_category(text):
@@ -220,103 +312,70 @@ def detect_category(text):
     categories = {
 
         "Fashion": [
-
-            "celana",
-            "baju",
-            "hoodie",
-            "kaos",
-            "sepatu",
-            "kemeja"
-
+            "baju","celana","kaos",
+            "hoodie","sepatu","kemeja"
         ],
 
         "Elektronik": [
-
-            "hp",
-            "tv",
-            "monitor",
-            "laptop",
-            "mouse"
-
-        ],
-
-        "Rumah Tangga": [
-
-            "kompor",
-            "gelas",
-            "blender",
-            "rice cooker"
-
+            "hp","laptop","tv",
+            "monitor","mouse"
         ],
 
         "Furniture": [
+            "lemari","rak","kursi","meja"
+        ],
 
-            "lemari",
-            "rak",
-            "kursi",
-            "meja"
-
+        "Rumah Tangga": [
+            "gelas","blender",
+            "rice cooker","kompor"
         ],
 
         "Peralatan Kerja": [
-
-            "tool",
-            "bor",
-            "obeng",
-            "kabel"
-
+            "bor","obeng",
+            "tool","kabel"
         ]
 
     }
 
     scores = {}
 
-    for category, keywords in categories.items():
+    for cat, keys in categories.items():
 
         score = 0
 
-        for keyword in keywords:
+        for k in keys:
 
-            if keyword in text:
-
+            if k in text:
                 score += 1
 
-        scores[category] = score
+        scores[cat] = score
 
-    best = max(
-        scores,
-        key=scores.get
-    )
+    best = max(scores, key=scores.get)
 
     if scores[best] == 0:
-
         return "Lainnya"
 
     return best
 
 # =========================================================
-# BULKY DETECTOR
+# BULKY
 # =========================================================
 
 def detect_bulky(text):
 
     text = str(text).lower()
 
-    bulky_keywords = [
-
+    bulky = [
         "lemari",
         "rak",
         "kursi",
         "meja",
-        "tv",
-        "monitor"
-
+        "tv"
     ]
 
-    for keyword in bulky_keywords:
+    for b in bulky:
 
-        if keyword in text:
-
+        if b in text:
             return "Bulky"
 
     return "Non Bulky"
@@ -325,54 +384,49 @@ def detect_bulky(text):
 # SMART SEARCH
 # =========================================================
 
-def smart_search_dataframe(dataframe, search):
+def smart_search(df, search):
 
     if not search:
-        return dataframe
+        return df
 
-    search_text = search.lower()
+    search = search.lower()
 
-    shortcuts = {
+    shortcut = {
 
-        "cd": "celana dalam",
-        "hp": "handphone"
+        "cd":"celana dalam",
+        "hp":"handphone"
 
     }
 
-    for short, full in shortcuts.items():
+    for k,v in shortcut.items():
 
-        if short in search_text:
+        search = search.replace(k,v)
 
-            search_text = search_text.replace(
-                short,
-                full
-            )
-
-    def smart_search(row):
+    def check(row):
 
         row_text = " ".join(
-            map(str, row)
+            map(str,row)
         ).lower()
 
-        if search_text in row_text:
+        if search in row_text:
             return True
 
-        similarity = fuzz.partial_ratio(
-            search_text,
+        score = fuzz.partial_ratio(
+            search,
             row_text
         )
 
-        return similarity >= 70
+        return score >= 70
 
-    return dataframe[
-        dataframe.apply(
-            smart_search,
+    return df[
+        df.apply(
+            check,
             axis=1
         )
     ]
 
 # =========================================================
-# MAIN APP
+# MAIN
 # =========================================================
 
 if uploaded_file:
@@ -389,119 +443,134 @@ if uploaded_file:
 
         df = pd.read_excel(uploaded_file)
 
+    # =====================================================
+    # CLEAN
+    # =====================================================
+
     df.columns = [
-
-        str(col).strip()
-
-        for col in df.columns
-
+        str(c).strip()
+        for c in df.columns
     ]
 
     # =====================================================
-    # AI CATEGORY
+    # AI SORTING
     # =====================================================
 
-    st.success(
-        "🔥 AI sedang menyortir data..."
-    )
+    st.success("🔥 AI sedang menyortir kategori...")
 
     df["AI_Category"] = df.astype(str).apply(
 
-        lambda row: detect_category(
-            " ".join(map(str, row))
+        lambda row:
+        detect_category(
+            " ".join(map(str,row))
         ),
 
         axis=1
-    )
 
-    # =====================================================
-    # BULKY
-    # =====================================================
+    )
 
     df["Bulky_Type"] = df.astype(str).apply(
 
-        lambda row: detect_bulky(
-            " ".join(map(str, row))
+        lambda row:
+        detect_bulky(
+            " ".join(map(str,row))
         ),
 
         axis=1
+
     )
 
     # =====================================================
     # KPI
     # =====================================================
 
-    total_rows = len(df)
+    total = len(df)
 
-    total_category = df["AI_Category"].nunique()
-
-    total_bulky = len(
-        df[
-            df["Bulky_Type"] == "Bulky"
-        ]
+    bulky = len(
+        df[df["Bulky_Type"]=="Bulky"]
     )
 
-    total_non_bulky = len(
-        df[
-            df["Bulky_Type"] == "Non Bulky"
-        ]
+    non_bulky = len(
+        df[df["Bulky_Type"]=="Non Bulky"]
     )
 
-    col1, col2, col3, col4 = st.columns(4)
+    category = df["AI_Category"].nunique()
 
-    with col1:
+    c1,c2,c3,c4 = st.columns(4)
+
+    with c1:
 
         st.markdown(f"""
 
-        <div class="metric-card">
+        <div class="kpi-card">
 
-        <h4>Total Data</h4>
-        <h2>{total_rows:,}</h2>
+        <div class="kpi-title">
+        TOTAL DATA
+        </div>
+
+        <div class="kpi-value">
+        {total:,}
+        </div>
 
         </div>
 
         """, unsafe_allow_html=True)
 
-    with col2:
+    with c2:
 
         st.markdown(f"""
 
-        <div class="metric-card">
+        <div class="kpi-card">
 
-        <h4>Kategori</h4>
-        <h2>{total_category}</h2>
+        <div class="kpi-title">
+        CATEGORY
+        </div>
+
+        <div class="kpi-value">
+        {category}
+        </div>
 
         </div>
 
         """, unsafe_allow_html=True)
 
-    with col3:
+    with c3:
 
         st.markdown(f"""
 
-        <div class="metric-card">
+        <div class="kpi-card">
 
-        <h4>Bulky</h4>
-        <h2>{total_bulky:,}</h2>
+        <div class="kpi-title">
+        BULKY
+        </div>
+
+        <div class="kpi-value">
+        {bulky:,}
+        </div>
 
         </div>
 
         """, unsafe_allow_html=True)
 
-    with col4:
+    with c4:
 
         st.markdown(f"""
 
-        <div class="metric-card">
+        <div class="kpi-card">
 
-        <h4>Non Bulky</h4>
-        <h2>{total_non_bulky:,}</h2>
+        <div class="kpi-title">
+        NON BULKY
+        </div>
+
+        <div class="kpi-value">
+        {non_bulky:,}
+        </div>
 
         </div>
 
         """, unsafe_allow_html=True)
 
-    st.divider()
+    st.write("")
 
     # =====================================================
     # SEARCH
@@ -511,82 +580,74 @@ if uploaded_file:
         "🔍 Cari SKU / Resi / Produk"
     )
 
-    filtered_df = smart_search_dataframe(
-        df,
-        search
-    )
+    filtered = smart_search(df, search)
 
     # =====================================================
     # FILTER
     # =====================================================
 
-    col1, col2 = st.columns(2)
+    f1,f2 = st.columns(2)
 
-    with col1:
+    with f1:
 
-        category_filter = st.multiselect(
-
+        cat_filter = st.multiselect(
             "🧠 Filter Category",
-
-            filtered_df["AI_Category"]
-            .unique()
-
+            filtered["AI_Category"].unique()
         )
 
-    with col2:
+    with f2:
 
         bulky_filter = st.multiselect(
-
             "📦 Filter Bulky",
-
-            filtered_df["Bulky_Type"]
-            .unique()
-
+            filtered["Bulky_Type"].unique()
         )
 
-    if category_filter:
+    if cat_filter:
 
-        filtered_df = filtered_df[
-            filtered_df["AI_Category"]
-            .isin(category_filter)
+        filtered = filtered[
+            filtered["AI_Category"]
+            .isin(cat_filter)
         ]
 
     if bulky_filter:
 
-        filtered_df = filtered_df[
-            filtered_df["Bulky_Type"]
+        filtered = filtered[
+            filtered["Bulky_Type"]
             .isin(bulky_filter)
         ]
 
     st.divider()
 
     # =====================================================
-    # CHARTS
+    # CHART
     # =====================================================
 
-    chart1, chart2 = st.columns(2)
+    g1,g2 = st.columns(2)
 
-    with chart1:
+    with g1:
 
-        category_count = (
-            filtered_df["AI_Category"]
+        cat_count = (
+            filtered["AI_Category"]
             .value_counts()
             .reset_index()
         )
 
-        category_count.columns = [
+        cat_count.columns = [
             "Category",
             "Count"
         ]
 
         fig = px.pie(
-
-            category_count,
-
+            cat_count,
             names="Category",
             values="Count",
-            hole=0.5
+            hole=0.6
+        )
 
+        fig.update_layout(
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+            height=450
         )
 
         st.plotly_chart(
@@ -594,10 +655,10 @@ if uploaded_file:
             use_container_width=True
         )
 
-    with chart2:
+    with g2:
 
         bulky_count = (
-            filtered_df["Bulky_Type"]
+            filtered["Bulky_Type"]
             .value_counts()
             .reset_index()
         )
@@ -608,13 +669,16 @@ if uploaded_file:
         ]
 
         fig2 = px.pie(
-
             bulky_count,
-
             names="Type",
             values="Count",
-            hole=0.5
+            hole=0.6
+        )
 
+        fig2.update_layout(
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+            height=450
         )
 
         st.plotly_chart(
@@ -631,104 +695,91 @@ if uploaded_file:
     st.subheader("📋 Shipment Data")
 
     st.dataframe(
-
-        filtered_df,
-
+        filtered,
         use_container_width=True,
-        height=600
-
+        height=650
     )
+
+    # =====================================================
+    # GOOGLE SEARCH
+    # =====================================================
 
     st.divider()
 
-    # =====================================================
-    # QUICK SEARCH
-    # =====================================================
+    st.subheader("🔎 Quick Search")
 
-    st.subheader("🔥 Quick Google Search")
-
-    possible_columns = [
-
+    possible = [
         "sku_name",
         "model_name",
         "product_name"
-
     ]
 
-    search_column = None
+    search_col = None
 
-    for col in possible_columns:
+    for c in possible:
 
-        if col in filtered_df.columns:
-
-            search_column = col
+        if c in filtered.columns:
+            search_col = c
             break
 
-    if search_column:
+    if search_col:
 
-        for index, row in filtered_df.head(10).iterrows():
+        for i,row in filtered.head(10).iterrows():
 
-            sku = str(
-                row[search_column]
-            )
+            sku = str(row[search_col])
 
             encoded = quote(sku)
 
-            google_url = (
+            google = (
                 f"https://www.google.com/search?q={encoded}"
             )
 
-            shopee_url = (
+            shopee = (
                 f"https://shopee.co.id/search?keyword={encoded}"
             )
 
-            image_url = (
+            image = (
                 f"https://www.google.com/search?tbm=isch&q={encoded}"
             )
 
-            with st.expander(
-                f"📦 {sku[:80]}"
-            ):
+            with st.expander(f"📦 {sku[:90]}"):
 
-                col1, col2, col3 = st.columns(3)
+                b1,b2,b3 = st.columns(3)
 
-                with col1:
-
+                with b1:
                     st.link_button(
                         "🔎 Google",
-                        google_url,
+                        google,
                         use_container_width=True
                     )
 
-                with col2:
-
+                with b2:
                     st.link_button(
                         "🛒 Shopee",
-                        shopee_url,
+                        shopee,
                         use_container_width=True
                     )
 
-                with col3:
-
+                with b3:
                     st.link_button(
                         "🖼 Images",
-                        image_url,
+                        image,
                         use_container_width=True
                     )
-
-    st.divider()
 
     # =====================================================
     # DOWNLOAD
     # =====================================================
 
-    csv = filtered_df.to_csv(
+    st.divider()
+
+    csv = filtered.to_csv(
         index=False
     ).encode("utf-8")
 
     st.download_button(
 
-        "⬇ Download CSV",
+        "⬇ DOWNLOAD RESULT",
 
         csv,
 
@@ -742,6 +793,4 @@ if uploaded_file:
 
 else:
 
-    st.info(
-        "📂 Upload XLSX / CSV dulu"
-    )
+    st.info("📂 Upload XLSX / CSV dulu")
